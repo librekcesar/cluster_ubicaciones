@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <!--llama a las librerias de leaflet-->
+  <head>
+    <script src="https://unpkg.com/leaflet@1.0.2/dist/leaflet.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.0.2/dist/leaflet.css"
+    />
+  <!--El problema al no cargar el cluster map era porque no había llamado las librerías necesarias -->
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.css" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/MarkerCluster.Default.css" />
+        <script src="http://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.3/leaflet.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.markercluster/0.5.0/leaflet.markercluster.js"></script>
+	
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.4/jquery.min.js"></script>	
+
+    <!--NOTA IMPORTANTE: RECUERDA que el geojson se debe de cambiar la extensión a .js-->
+<!--Y abrir el archivo js en editor como visual y antes de todo el código poner la siguiente sentencia:-->
+<!--  var densidad ={todo el código de javascript}   -->
+
+    <!--El contenedor del mapa se agrega en el primer div del head-->
+    <style>
+      #map {
+        width: 100%;
+        height: 580px;
+        box-shadow: 5px 5px 5px #888;
+      }
+    </style>
+
+    <!--Esta linea importa el archivo vectorial. Es importante mencionar que esta en local y se cambio la extensión a .js-->
+    <!--Se cambia la extensión para que pueda leerlo. luego se llama esta capa más abajo en la parte del body en la parte de js-->
+    <!--<script type="text/javascript" src="buf_del_cell_wgs84.js"></script>-->
+
+    <!--intentr con estos enlaces de js, estos enlaces tambien sirvieron para hacer el cluster map-->
+    <script src="js/angular.min.js"></script>
+		<script src="js/angular-leaflet-directive.min.js"></script>
+    <!--Aqui terminan -->
+    <script type="text/javascript" src="intersec_p99_2.js"> </script>
+    <script type="text/javascript" src="buf_del_cell_wgs84.js"> </script>
+    
+    
+
+  </head>
+  <body>
+    <!--Esta linea genera un unico elemento de documento, es un marcador para el mapa. se le dá un atributo id para hacer referencia al mapa-->
+    <div id="map"></div>
+    <!--L.map es la clase central de la API, Se usa para crear y manipular el mapa-->
+    <script>
+      var map = L.map("map").setView([19.3797717, -99.265339], 10);
+
+      
+      //Esta linea añade un mapa base o las capas de openstreet map en este caso
+      L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution:
+          'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>',
+        maxZoom: 18
+      }).addTo(map);
+
+      //Añadiendo un control de escala (muestra la escala a la que se encuentra el mapa)
+      L.control.scale().addTo(map);
+      
+ ///////////Intento cluster map
+ 
+
+        function pop_popplaces(feature, layer) {
+            var popupContent = 'name: ' + String(feature.properties['id']) + '<br>dir_dest: ' + String(feature.properties['dir_dest']);
+            layer.bindPopup(popupContent);
+        }
+        function popplaces_marker(feature, latlng) {
+            return L.circleMarker(latlng, {
+                radius: 4.0,
+                fillColor: '#ff0000',
+                color: '#000000',
+                weight: 1,
+                opacity: 1.0,
+                fillOpacity: 0.8
+            })
+        }
+	
+        var popplaces = new L.geoJson(intersec_p99_2,{
+
+            onEachFeature: pop_popplaces,
+            pointToLayer: popplaces_marker
+		
+        });
+
+	
+	
+        var cluster_popplaces= new L.MarkerClusterGroup({showCoverageOnHover: false});
+        cluster_popplaces.addLayer(popplaces);
+        cluster_popplaces.addTo(map);
+
+        L.geoJson(buf_del_cell_wgs84).addTo(map);
+ 
+///////////// 
+var baseMaps = {'OSM Black & White': basemap_0};
+        controler = L.control.layers(baseMaps,{"entregas": cluster_popplaces},{collapsed:false}).addTo(map);
+
+
+//LAYER CONTROL	
+
+
+              
+
+    </script>
+  </body>
+</html>
