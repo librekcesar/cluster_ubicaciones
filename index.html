@@ -96,7 +96,8 @@
         L.geoJson(buf_del_cell_wgs84).addTo(map);
  
 ///////////// 
-
+var baseMaps = {'OSM Black & White': basemap_0};
+        controler = L.control.layers(baseMaps,{"entregas": cluster_popplaces},{collapsed:false}).addTo(map);
 
 
 //LAYER CONTROL	
